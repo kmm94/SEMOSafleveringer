@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "938117553259",
+    "firebase_url": "https://seomstest-1f9b9.firebaseio.com",
+    "project_id": "seomstest-1f9b9",
+    "storage_bucket": "seomstest-1f9b9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:938117553259:android:e7984f47403d30e8",
+        "android_client_info": {
+          "package_name": "karim.seoms.seoms"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "938117553259-3g52o5nr5e5449lc3ri2qirpre1t3l6e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "karim.seoms.seoms",
+            "certificate_hash": "8232393ae14fcd8d32ecb236d91a762d2e8b3b2d"
+          }
+        },
+        {
+          "client_id": "938117553259-tn5q7a1re1m8i6egti2ccjqumdnquepb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3PPFTB4dJ65H_SVln7AACm0O9uIUFxUc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "938117553259-tn5q7a1re1m8i6egti2ccjqumdnquepb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constrainLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="328dp"
+        android:layout_height="333dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:fadeScrollbars="true"
+        android:gravity="bottom"
+        android:isScrollContainer="true"
+        android:scrollbarAlwaysDrawHorizontalTrack="true"
+        android:scrollbars="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.049" />
+
+    <Button
+        android:id="@+id/getLastLocation_Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="get last location"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.071"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintVertical_bias="0.061" />
+
+    <Switch
+        android:id="@+id/gps_switch"
+        android:layout_width="82dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="56dp"
+        android:layout_marginBottom="8dp"
+        android:text="GPS"
+        android:textOff="OFF"
+        android:textOn="ON"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/getLastLocation_Button"
+        app:layout_constraintVertical_bias="0.333" />
+
+    <Switch
+        android:id="@+id/sound_switch"
+        android:layout_width="121dp"
+        android:layout_height="34dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Sound level"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/gps_switch"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/soundTextView"
+        android:layout_width="152dp"
+        android:layout_height="21dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
+        android:text="Sound"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.355"
+        app:layout_constraintStart_toEndOf="@+id/sound_switch"
+        app:layout_constraintTop_toTopOf="@+id/sound_switch"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Switch
+        android:id="@+id/proximity_switch"
+        android:layout_width="119dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Proximity"
+        app:layout_constraintBottom_toTopOf="@+id/soundTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.513"
+        app:layout_constraintStart_toEndOf="@+id/gps_switch" />
+
+    <Switch
+        android:id="@+id/light_switch"
+        android:layout_width="90dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="20dp"
+        android:text="Light"
+        app:layout_constraintBottom_toTopOf="@+id/proximity_switch"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.48"
+        app:layout_constraintStart_toEndOf="@+id/getLastLocation_Button"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Switch
+        android:id="@+id/activity_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Record Activity"
+        app:layout_constraintBottom_toTopOf="@+id/proximity_switch"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.772"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/light_switch"
+        app:layout_constraintVertical_bias="0.0" />
+
+</android.support.constraint.ConstraintLayout>
