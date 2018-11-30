@@ -50,65 +50,61 @@ public class BroadcastReceiver extends IntentService {
     }
 
 
-    private void handleDetectedActivities(List<DetectedActivity> probableActivities) {
-        for (DetectedActivity activity : probableActivities) {
-
-            switch (activity.getType()) {
-                case DetectedActivity.IN_VEHICLE: {
-                    addToData(new ActivityHolder(IN_VEHICLE, activity));
-                    Log.e(MainActivity.ACTIVITY_TAG, IN_VEHICLE+ EXTRA + activity.getConfidence());
-                    break;
-                }
-                case DetectedActivity.ON_BICYCLE: {
-                    addToData(new ActivityHolder(ON_BICYCLE, activity));
-                    Log.e(MainActivity.ACTIVITY_TAG, ON_BICYCLE+ EXTRA + activity.getConfidence());
-                    break;
-                }
-                case DetectedActivity.RUNNING: {
-                    addToData(new ActivityHolder(RUNNING, activity));
-                    Log.e(MainActivity.ACTIVITY_TAG, RUNNING+ EXTRA + activity.getConfidence());
-                    break;
-                }
-                case DetectedActivity.STILL: {
-                    addToData(new ActivityHolder(STILL, activity));
-                    Log.e(MainActivity.ACTIVITY_TAG, STILL+ EXTRA + activity.getConfidence());
-                    break;
-                }
-                case DetectedActivity.WALKING: {
-                    addToData(new ActivityHolder(WALKING, activity));
-                    Log.e(MainActivity.ACTIVITY_TAG, WALKING+ EXTRA + activity.getConfidence());
-                    break;
-                }
-                case DetectedActivity.ON_FOOT: {
-                    addToData(new ActivityHolder(ON_FOOT, activity));
-                    Log.e(MainActivity.ACTIVITY_TAG, ON_FOOT+ EXTRA + activity.getConfidence());
-                    break;
-                }
-                case DetectedActivity.TILTING: {
-                    addToData(new ActivityHolder(TILTING, activity));
-                    Log.e(MainActivity.ACTIVITY_TAG, TILTING+ EXTRA + activity.getConfidence());
-                    break;
-                }
-                default: {
-                    addToData(new ActivityHolder(UNKNOWN, activity));
-                    Log.e(MainActivity.ACTIVITY_TAG, UNKNOWN+ EXTRA + activity.getConfidence());
-                }
+    private void handleDetectedActivities(DetectedActivity activity) {
+        switch (activity.getType()) {
+            case DetectedActivity.IN_VEHICLE: {
+                addToData(new ActivityHolder(IN_VEHICLE, activity));
+                Log.e(MainActivity.ACTIVITY_TAG, IN_VEHICLE + EXTRA + activity.getConfidence());
+                break;
+            }
+            case DetectedActivity.ON_BICYCLE: {
+                addToData(new ActivityHolder(ON_BICYCLE, activity));
+                Log.e(MainActivity.ACTIVITY_TAG, ON_BICYCLE + EXTRA + activity.getConfidence());
+                break;
+            }
+            case DetectedActivity.RUNNING: {
+                addToData(new ActivityHolder(RUNNING, activity));
+                Log.e(MainActivity.ACTIVITY_TAG, RUNNING + EXTRA + activity.getConfidence());
+                break;
+            }
+            case DetectedActivity.STILL: {
+                addToData(new ActivityHolder(STILL, activity));
+                Log.e(MainActivity.ACTIVITY_TAG, STILL + EXTRA + activity.getConfidence());
+                break;
+            }
+            case DetectedActivity.WALKING: {
+                addToData(new ActivityHolder(WALKING, activity));
+                Log.e(MainActivity.ACTIVITY_TAG, WALKING + EXTRA + activity.getConfidence());
+                break;
+            }
+            case DetectedActivity.ON_FOOT: {
+                addToData(new ActivityHolder(ON_FOOT, activity));
+                Log.e(MainActivity.ACTIVITY_TAG, ON_FOOT + EXTRA + activity.getConfidence());
+                break;
+            }
+            case DetectedActivity.TILTING: {
+                addToData(new ActivityHolder(TILTING, activity));
+                Log.e(MainActivity.ACTIVITY_TAG, TILTING + EXTRA + activity.getConfidence());
+                break;
+            }
+            default: {
+                addToData(new ActivityHolder(UNKNOWN, activity));
+                Log.e(MainActivity.ACTIVITY_TAG, UNKNOWN + EXTRA + activity.getConfidence());
             }
         }
+
     }
 
     private void addToData(ActivityHolder activity) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
-        data.put(simpleDateFormat.format(new Date()),activity);
-        toUI(simpleDateFormat.format(new Date()),activity);
+        data.put(simpleDateFormat.format(new Date()), activity);
+        toUI(simpleDateFormat.format(new Date()), activity);
         writeToCSV(data);
     }
 
     private void toUI(String format, ActivityHolder activity) {
-        new Handler(Looper.getMainLooper()).post(new Runnable()
-        {
-            public void run()
-            {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            public void run() {
                 MainActivity.textView.append("Timestamp: " + format + "\n Status: " + activity.getActivityName() + ". Confidence: " + activity.getActivity().getConfidence() + "\n");
             }
         });
@@ -118,32 +114,32 @@ public class BroadcastReceiver extends IntentService {
     protected void onHandleIntent(@Nullable Intent intent) {
         if (ActivityRecognitionResult.hasResult(intent)) {
             ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
-            handleDetectedActivities(result.getProbableActivities());
+            handleDetectedActivities(result.getMostProbableActivity());
         }
     }
 
     private void writeToCSV(TreeMap<String, ActivityHolder> data) {
-            String state = Environment.getExternalStorageState();
-            if (Environment.MEDIA_MOUNTED.equals(state)) {
-                File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "DataOPG5.csv");
-                CsvWriter csvWriter = new CsvWriter();
-                csvWriter.setFieldSeparator(';');
-                try (CsvAppender csvAppender = csvWriter.append(file, StandardCharsets.UTF_8)) {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "DataOPG5.csv");
+            CsvWriter csvWriter = new CsvWriter();
+            csvWriter.setFieldSeparator(';');
+            try (CsvAppender csvAppender = csvWriter.append(file, StandardCharsets.UTF_8)) {
 
-                    data.forEach((date, activityHolder) -> {
-                        try {
-                            csvAppender.appendLine(date,activityHolder.getActivityName(), String.valueOf(activityHolder.getActivity().getConfidence()));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    });
+                data.forEach((date, activityHolder) -> {
+                    try {
+                        csvAppender.appendLine(date, activityHolder.getActivityName(), String.valueOf(activityHolder.getActivity().getConfidence()));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
 
-                } catch (IOException e) {
-                    Log.e(WRITE_TAG, e.toString());
-                }
-
-
+            } catch (IOException e) {
+                Log.e(WRITE_TAG, e.toString());
             }
+
+
+        }
 
 
     }
