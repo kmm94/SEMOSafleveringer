@@ -203,8 +203,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         });
 
         /**
-         * Opgave 5:
-         * sammenling fx  accelerometer data med med et activity reconigtion api
+         * Task 5:
+         * Implement an app that use one of the commercial activity recognition APIs to collect activity information.
+         * Use the app to collect some inferences of your own activities over an hour.
+         * Hand-in a plot of the inferences and comments for the accuracy of the inferences.
+         *
+         * Solution:
+         * API: Google activity recognition API
+         * Save the Activity in an csv file that is accessible from the phone file system, plot it using R.
+         * CSV file contents: timestamp, confidence & activity.
+         *
+         * limits:
+         * Not sure if it can track user with lock phone.
          */
         //Getting google activity info
         List<ActivityTransition> transitions = new ArrayList<>();
@@ -257,6 +267,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
             }
         });
+
+        /**
+         * Task 7
+         * Make an Architectural Prototype addressing the availability pattern you observed in your collected data using one of the resource availability tactics.
+         *
+         * Solution:
+         * Tactic: Increase Resources
+         * The plan is to use the accelerometer and the gyroscope to avoid a degraded service.
+         */
+
+
+
+
     }
 
     private void sendTextToFireBase(String Key, String dark) {
