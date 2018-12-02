@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private ActivityRecognitionClient mActivityRecognitionClient;
     private final int WRITE_PERMISSION_CODE = 001;
     private ConstraintLayout constraintLayout;
+    private SensorManager mSensorManager;
 
     /**
      * Dispatch onPause() to fragments.
@@ -79,9 +80,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         constraintLayout = findViewById(R.id.constrainLayout);
-        //ActivtyReconition
-//        broadcastReceiver = new karim.seoms.seoms.BroadcastReceiver(this);
 
+        //Sensor manager for different task.
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
         //View
         textView = findViewById(R.id.textView);
@@ -186,14 +187,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //Light
         Switch lightSwitch = findViewById(R.id.light_switch);
         lightSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            SensorManager mSensorManager;
-            mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
             Sensor mLight;
             mLight = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-
             if (isChecked) {
-                if (mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT) != null) {
-                    mSensorManager.registerListener(this, mLight, SensorManager.SENSOR_DELAY_NORMAL);
+                if (mLight != null) {
+                    mSensorManager.registerListener(this, mLight, SensorManager.SENSOR_DELAY_UI);
                 } else {
                     Toast.makeText(getBaseContext(), "There is no light sensor", Toast.LENGTH_SHORT).show();
                 }
@@ -222,7 +220,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
-        //Getting adding accelerometer listener
         Switch recordActivitySwitch = findViewById(R.id.activity_switch);
         recordActivitySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -276,7 +273,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
          * Tactic: Increase Resources
          * The plan is to use the accelerometer and the gyroscope to avoid a degraded service.
          */
-
+        Switch recordGyroAndAcc = findViewById(R.id.task5_switch);
+        recordGyroAndAcc.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            Sensor mAccSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            Sensor mGyroSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+            if(isChecked){
+                mSensorManager.registerListener(this, mAccSensor, SensorManager.SENSOR_DELAY_UI);
+                mSensorManager.registerListener(this, mGyroSensor, SensorManager.SENSOR_DELAY_UI);
+            } else {
+                mSensorManager.unregisterListener(this,mGyroSensor);
+                mSensorManager.unregisterListener(this, mAccSensor);
+            }
+        });
 
 
 
@@ -349,10 +357,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onSensorChanged(SensorEvent event) {
         switch (event.sensor.getType()) {
             case (Sensor.TYPE_ACCELEROMETER):
-                appendTextToTextView("x: " + event.values[0] + " y: " + event.values[1] + " z: " + event.values[2]);
+                appendTextToTextView("Acc x: " + event.values[0] + " y: " + event.values[1] + " z: " + event.values[2]);
                 break;
             case (Sensor.TYPE_LIGHT):
                 appendTextToTextView("Light: " + event.values[0] + " Lux");
+                break;
+            case (Sensor.TYPE_GYROSCOPE):
+                appendTextToTextView("Gyro x: " + event.values[0] + " y: " + event.values[1] + " z: " + event.values[2]);
                 break;
             default:
                 appendTextToTextView(event.sensor.getStringType());

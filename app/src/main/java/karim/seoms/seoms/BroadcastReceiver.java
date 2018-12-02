@@ -22,6 +22,10 @@ import java.util.TreeMap;
 import de.siegmar.fastcsv.writer.CsvAppender;
 import de.siegmar.fastcsv.writer.CsvWriter;
 
+
+/**
+ * This class is completly for Task 5
+ */
 public class BroadcastReceiver extends IntentService {
 
     public static final String IN_VEHICLE = "In Vehicle";
