@@ -13,8 +13,6 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Environment;
-import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -32,12 +30,8 @@ import android.widget.Toast;
 import com.github.nisrulz.sensey.ProximityDetector;
 import com.github.nisrulz.sensey.Sensey;
 import com.github.nisrulz.sensey.SoundLevelDetector;
-import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.ActivityRecognitionClient;
 import com.google.android.gms.location.ActivityTransition;
-import com.google.android.gms.location.ActivityTransitionEvent;
-import com.google.android.gms.location.ActivityTransitionRequest;
-import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.Task;
@@ -45,32 +39,26 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
-import de.siegmar.fastcsv.writer.CsvAppender;
-import de.siegmar.fastcsv.writer.CsvWriter;
+public class MainActivity extends AppCompatActivity implements SensorEventListener, IsDoneWritingToCSV {
 
-public class MainActivity extends AppCompatActivity implements SensorEventListener {
-
-    private FusedLocationProviderClient mFusedLocationClient;
     public static TextView textView;
+    public static final String ACTIVITY_TAG = "Activity recognition";
+    public static final String WRITE_TO_CSV_TAG = "CSV writing";
     private Activity activity = this;
     private LocationListener locationListener;
     private LocationManager locationManager;
     private karim.seoms.seoms.BroadcastReceiver broadcastReceiver;
-    public static final String ACTIVITY_TAG = "Activity recognition";
     private ActivityRecognitionClient mActivityRecognitionClient;
     private final int WRITE_PERMISSION_CODE = 001;
     private ConstraintLayout constraintLayout;
     private SensorManager mSensorManager;
-    private ArrayList<String> dataAcc = new ArrayList<>();
-    private ArrayList<String> dataGyro = new ArrayList<>();
+    private ArrayList<String> dataAcc;
+    private ArrayList<String> dataGyro;
+    private FusedLocationProviderClient mFusedLocationClient;
+    private boolean isWritingToCSV = false;
 
     /**
      * Dispatch onPause() to fragments.
@@ -282,27 +270,39 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
          * Solution:
          * Tactic: Increase Resources
          * The plan is to use the accelerometer and the gyroscope to avoid a degraded service.
+         * goal: print acc and gyro data to screen. DONE
+         * goal: save acc and gyro data to file for processing in R. DONE
+         *
+         * Limits:
+         * Not running in background.
          */
         Switch recordGyroAndAcc = findViewById(R.id.task5_switch);
         recordGyroAndAcc.setOnCheckedChangeListener((buttonView, isChecked) -> {
             Sensor mAccSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
             Sensor mGyroSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
             if (isChecked) {
+                dataAcc = new ArrayList<>();
+                dataGyro = new ArrayList<>();
                 mSensorManager.registerListener(this, mAccSensor, SensorManager.SENSOR_DELAY_UI);
                 mSensorManager.registerListener(this, mGyroSensor, SensorManager.SENSOR_DELAY_UI);
             } else {
                 mSensorManager.unregisterListener(this, mGyroSensor);
                 mSensorManager.unregisterListener(this, mAccSensor);
-                appendAccCSV(dataAcc,"AccData.csv");
-                appendAccCSV(dataGyro, "GyroData.csv");
+                if(!isWritingToCSV) {
+                    isWritingToCSV = true;
+                    appendAccCSV(dataAcc, "AccData.csv");
+                    appendAccCSV(dataGyro, "GyroData.csv");
+                } else {
+                    appendTextToTextView("Writing in progress, cant save data now");
+                }
             }
         });
 
 
     }
 
-    private void toArrays(String... strings){
-        if(strings[0].equals("Acc")){
+    private void toArrays(String... strings) {
+        if (strings[0].equals("Acc")) {
             toArray(strings, dataAcc);
         } else {
             toArray(strings, dataGyro);
@@ -310,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     private void toArray(String[] strings, ArrayList<String> dataArray) {
-        for(int i =0; i < strings.length; i++) {
+        for (int i = 0; i < strings.length; i++) {
             if (strings[i].startsWith("x") || strings[i].startsWith("y") || strings[i].startsWith("z")) {
                 dataArray.add(strings[i]);
                 dataArray.add(strings[++i]);
@@ -318,27 +318,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-    private void appendAccCSV(ArrayList<String> strings, String fileName){
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), fileName);
-            CsvWriter csvWriter = new CsvWriter();
-            csvWriter.setFieldSeparator(';');
-            try (CsvAppender csvAppender = csvWriter.append(file, StandardCharsets.UTF_8)) {
-                csvAppender.appendLine("x", "y", "z");
-                for(int i =0; i <strings.size();)
-                {
-                    try {
-                        csvAppender.appendLine(strings.get(i=+1), strings.get(i+=2), strings.get(i+=2));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+    private void appendAccCSV(ArrayList<String> strings, String fileName) {
+        strings.set(0, fileName);
+        String[] data = new String[strings.size()];
+        strings.toArray(data);
+        new WriteToCSVFileTask(this).execute(data);
     }
 
 
@@ -411,14 +395,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         switch (event.sensor.getType()) {
             case (Sensor.TYPE_ACCELEROMETER):
                 appendTextToTextView("Acc x: " + event.values[0] + " y: " + event.values[1] + " z: " + event.values[2]);
-                toArrays("Acc","x:", String.valueOf(event.values[0]), "y: ", String.valueOf(event.values[1]), "z: ", String.valueOf(event.values[2]));
+                toArrays("Acc", "x:", String.valueOf(event.values[0]), "y: ", String.valueOf(event.values[1]), "z: ", String.valueOf(event.values[2]));
                 break;
             case (Sensor.TYPE_LIGHT):
                 appendTextToTextView("Light: " + event.values[0] + " Lux");
                 break;
             case (Sensor.TYPE_GYROSCOPE):
                 appendTextToTextView("Gyro x: " + event.values[0] + " y: " + event.values[1] + " z: " + event.values[2]);
-                toArrays("Gyro","x:", String.valueOf(event.values[0]), "y: ", String.valueOf(event.values[1]), "z: ", String.valueOf(event.values[2]));
+                toArrays("Gyro", "x:", String.valueOf(event.values[0]), "y: ", String.valueOf(event.values[1]), "z: ", String.valueOf(event.values[2]));
                 break;
             default:
                 appendTextToTextView(event.sensor.getStringType());
@@ -430,5 +414,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    @Override
+    public void isDone(Boolean b, String fileName) {
+        isWritingToCSV = false;
+        appendTextToTextView("Data saved in Documents, file name: " + fileName);
     }
 }
