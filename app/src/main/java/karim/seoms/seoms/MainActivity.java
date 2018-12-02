@@ -325,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             CsvWriter csvWriter = new CsvWriter();
             csvWriter.setFieldSeparator(';');
             try (CsvAppender csvAppender = csvWriter.append(file, StandardCharsets.UTF_8)) {
-
+                csvAppender.appendLine("x", "y", "z");
                 for(int i =0; i <strings.size();)
                 {
                     try {
@@ -418,6 +418,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 break;
             case (Sensor.TYPE_GYROSCOPE):
                 appendTextToTextView("Gyro x: " + event.values[0] + " y: " + event.values[1] + " z: " + event.values[2]);
+                toArrays("Gyro","x:", String.valueOf(event.values[0]), "y: ", String.valueOf(event.values[1]), "z: ", String.valueOf(event.values[2]));
                 break;
             default:
                 appendTextToTextView(event.sensor.getStringType());
