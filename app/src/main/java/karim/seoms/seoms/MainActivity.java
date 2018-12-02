@@ -87,7 +87,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         textView.setText("");
         textView.setMovementMethod(new ScrollingMovementMethod());
 
-
+/**
+ * Task 1:
+ * Check out android sensor API
+ *
+ * Solution:
+ * implement gps, light, sound and Proximity.
+ */
         //Get last location
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -122,7 +128,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         gpsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 Toast.makeText(activity, "Getting GPS location", Toast.LENGTH_SHORT).show();
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 10, locationListener);
+                /**
+                 * Task 4
+                 * Choose a QAS(Quality attribute scenario)
+                 * i choose Energy efficiency, which is about optimising a sensor to use less power.
+                 *
+                 * Task 6
+                 * Pick a tactic on energy efficiency.
+                 * Implement an architectural prototype that illustrates the tactic.
+                 * Hand-in a summary of how the prototype explores the tactic including code snippets from your prototype code.
+                 *
+                 * Solution to 4 & 6:
+                 * Use android build in minDistance on gps compare 0 to 10 with the android profiler to see
+                 * if power is estimated to be saved.
+                 */
+                int minDis = 0;
+
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, minDis, locationListener);
             } else {
                 locationManager.removeUpdates(locationListener);
             }
@@ -130,11 +152,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         //Last Known Location
         Button buttonOne = findViewById(R.id.getLastLocation_Button);
-        buttonOne.setOnClickListener(new Button.OnClickListener() {
-            public void onClick(View v) {
-                Log.d("location", "button_click");
-                getLastKnownLocation();
-            }
+        buttonOne.setOnClickListener(v -> {
+            getLastKnownLocation();
         });
 
         //Sound
@@ -235,9 +254,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     Task<Void> task = mActivityRecognitionClient.requestActivityUpdates(1000, pendingIntent);
 
                     task.addOnSuccessListener(
-                            result -> {
-                                Log.d(ACTIVITY_TAG, "successful attached");
-                            }
+                            result -> Log.d(ACTIVITY_TAG, "successful attached")
                     );
 
                     task.addOnFailureListener(
