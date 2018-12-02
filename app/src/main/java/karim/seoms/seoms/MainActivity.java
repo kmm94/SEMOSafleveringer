@@ -13,6 +13,7 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
@@ -44,9 +45,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import de.siegmar.fastcsv.writer.CsvAppender;
+import de.siegmar.fastcsv.writer.CsvWriter;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -61,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private final int WRITE_PERMISSION_CODE = 001;
     private ConstraintLayout constraintLayout;
     private SensorManager mSensorManager;
+    private ArrayList<String> dataAcc = new ArrayList<>();
+    private ArrayList<String> dataGyro = new ArrayList<>();
 
     /**
      * Dispatch onPause() to fragments.
@@ -277,18 +287,60 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         recordGyroAndAcc.setOnCheckedChangeListener((buttonView, isChecked) -> {
             Sensor mAccSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
             Sensor mGyroSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-            if(isChecked){
+            if (isChecked) {
                 mSensorManager.registerListener(this, mAccSensor, SensorManager.SENSOR_DELAY_UI);
                 mSensorManager.registerListener(this, mGyroSensor, SensorManager.SENSOR_DELAY_UI);
             } else {
-                mSensorManager.unregisterListener(this,mGyroSensor);
+                mSensorManager.unregisterListener(this, mGyroSensor);
                 mSensorManager.unregisterListener(this, mAccSensor);
+                appendAccCSV(dataAcc,"AccData.csv");
+                appendAccCSV(dataGyro, "GyroData.csv");
             }
         });
 
 
-
     }
+
+    private void toArrays(String... strings){
+        if(strings[0].equals("Acc")){
+            toArray(strings, dataAcc);
+        } else {
+            toArray(strings, dataGyro);
+        }
+    }
+
+    private void toArray(String[] strings, ArrayList<String> dataArray) {
+        for(int i =0; i < strings.length; i++) {
+            if (strings[i].startsWith("x") || strings[i].startsWith("y") || strings[i].startsWith("z")) {
+                dataArray.add(strings[i]);
+                dataArray.add(strings[++i]);
+            }
+        }
+    }
+
+    private void appendAccCSV(ArrayList<String> strings, String fileName){
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), fileName);
+            CsvWriter csvWriter = new CsvWriter();
+            csvWriter.setFieldSeparator(';');
+            try (CsvAppender csvAppender = csvWriter.append(file, StandardCharsets.UTF_8)) {
+
+                for(int i =0; i <strings.size();)
+                {
+                    try {
+                        csvAppender.appendLine(strings.get(i=+1), strings.get(i+=2), strings.get(i+=2));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     private void sendTextToFireBase(String Key, String dark) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -335,6 +387,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         myRef.setValue("Latitude: " + location.getLatitude() + "Longitude: " + location.getLongitude() + "Accuracy: " + location.getAccuracy());
     }
 
+
     /**
      * Called when there is a new sensor event.  Note that "on changed"
      * is somewhat of a misnomer, as this will also be called if we have a
@@ -358,6 +411,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         switch (event.sensor.getType()) {
             case (Sensor.TYPE_ACCELEROMETER):
                 appendTextToTextView("Acc x: " + event.values[0] + " y: " + event.values[1] + " z: " + event.values[2]);
+                toArrays("Acc","x:", String.valueOf(event.values[0]), "y: ", String.valueOf(event.values[1]), "z: ", String.valueOf(event.values[2]));
                 break;
             case (Sensor.TYPE_LIGHT):
                 appendTextToTextView("Light: " + event.values[0] + " Lux");
