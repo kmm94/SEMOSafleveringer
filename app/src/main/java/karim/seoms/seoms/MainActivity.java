@@ -48,7 +48,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity implements SensorEventListener, ActivityInfo {
+public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     private FusedLocationProviderClient mFusedLocationClient;
     public static TextView textView;
@@ -372,24 +372,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     }
 
-    /**
-     * Called when the accuracy of the registered sensor has changed.  Unlike
-     * onSensorChanged(), this is only called when this accuracy value changes.
-     * <p>
-     * <p>See the SENSOR_STATUS_* constants in
-     * {@link SensorManager SensorManager} for details.
-     *
-     * @param sensor
-     * @param accuracy The new accuracy of this sensor, one of
-     *                 {@code SensorManager.SENSOR_STATUS_*}
-     */
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
-    }
-
-    @Override
-    public void Activity(ActivityTransitionEvent e) {
-        appendTextToTextView(e.toString());
     }
 }
