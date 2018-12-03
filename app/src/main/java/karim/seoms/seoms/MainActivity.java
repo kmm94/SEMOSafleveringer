@@ -13,6 +13,7 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Environment;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -167,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Switch soundSwitch = findViewById(R.id.sound_switch);
         soundSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
-                Toast.makeText(activity, "listning to sound", Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, "listening to sound", Toast.LENGTH_SHORT).show();
                 Sensey.getInstance().startSoundLevelDetection(activity, soundLevelListener);
             } else {
                 Sensey.getInstance().stopSoundLevelDetection();
@@ -232,7 +233,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
          * Not sure if it can track user with lock phone.
          */
         //Getting google activity info
-        List<ActivityTransition> transitions = new ArrayList<>();
         Intent intent = new Intent(this, BroadcastReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -310,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     appendAccCSV(dataAcc, "AccData.csv");
                     appendAccCSV(dataGyro, "GyroData.csv");
                 } else {
-                    appendTextToTextView("Writing in progress, cant save data now");
+                    appendTextToTextView("Writing in progress, can't save data now");
                 }
             }
         });
@@ -349,9 +349,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         myRef.setValue(dark);
     }
 
+    /**
+     * Prints last know location to screen.
+     */
     private void getLastKnownLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.d("location", "no permission");
+            Snackbar.make(constraintLayout, "You are an idiot(Permission DENIED!)", Snackbar.LENGTH_SHORT).show();
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    WRITE_PERMISSION_CODE);
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    WRITE_PERMISSION_CODE);
             return;
         }
         mFusedLocationClient.getLastLocation()
@@ -437,9 +446,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void isDone(Boolean isCompleted, String fileName) {
         if(isCompleted) {
             isWritingToCSV = false;
-            appendTextToTextView("Data saved in Documents, file name: " + fileName);
+            appendTextToTextView("Data saved in "+ Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) +", File name: " + fileName);
         } else {
-            Snackbar.make(constraintLayout, "An error occurred with file: " + fileName, Snackbar.LENGTH_LONG);
+            Snackbar.make(constraintLayout, "An error occurred with file: " + fileName, Snackbar.LENGTH_LONG).show();
         }
     }
 }
