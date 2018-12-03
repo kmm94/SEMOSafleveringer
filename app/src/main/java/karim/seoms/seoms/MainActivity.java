@@ -13,16 +13,15 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Bundle;
 import android.os.Environment;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -32,16 +31,11 @@ import com.github.nisrulz.sensey.ProximityDetector;
 import com.github.nisrulz.sensey.Sensey;
 import com.github.nisrulz.sensey.SoundLevelDetector;
 import com.google.android.gms.location.ActivityRecognitionClient;
-import com.google.android.gms.location.ActivityTransition;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener, IsDoneWritingToCSV {
 
@@ -109,7 +103,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public void onLocationChanged(Location location) {
                 appendLocationToTextView(location, "\nGPS Pos:");
-                sendLocationToFirebase(location, "GPS");
             }
 
             @Override
@@ -182,13 +175,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public void onNear() {
                 appendTextToTextView("Phone is near something");
-                sendTextToFireBase(proximitySensorKey, "something is near the phone");
             }
 
             @Override
             public void onFar() {
                 appendTextToTextView("Phone is in safe distance from everything!");
-                sendTextToFireBase(proximitySensorKey, "Nothing is close to the phone");
             }
         };
 
@@ -342,13 +333,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         new WriteToCSVFileTask(this).execute(data);
     }
 
-
-    private void sendTextToFireBase(String Key, String dark) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference(Key);
-        myRef.setValue(dark);
-    }
-
     /**
      * Prints last known location to screen.
      */
@@ -369,7 +353,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     if (location != null) {
                         // Logic to handle location object
                         appendLocationToTextView(location, "\nLast know location:");
-                        sendLocationToFirebase(location, "LastKnown");
                     } else {
                         Toast.makeText(activity, "location data is null", Toast.LENGTH_LONG).show();
                         Log.d("location", "null");
@@ -389,12 +372,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     public void appendTextToTextView(String text) {
         textView.append("\n\n" + text);
-    }
-
-    private void sendLocationToFirebase(Location location, String type) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference(type);
-        myRef.setValue("Latitude: " + location.getLatitude() + "Longitude: " + location.getLongitude() + "Accuracy: " + location.getAccuracy());
     }
 
 
