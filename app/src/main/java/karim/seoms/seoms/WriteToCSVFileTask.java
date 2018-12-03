@@ -28,7 +28,7 @@ public class WriteToCSVFileTask extends AsyncTask<String ,Void,Boolean> {
         filename = strings[0];
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state)) {
-            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), strings[0]);
+            File file = new File(MainActivity.FILEPATH, strings[0]);
             CsvWriter csvWriter = new CsvWriter();
             csvWriter.setFieldSeparator(';');
             try (CsvAppender csvAppender = csvWriter.append(file, StandardCharsets.UTF_8)) {

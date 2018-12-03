@@ -42,11 +42,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public static TextView textView;
     public static final String ACTIVITY_TAG = "Activity recognition";
     public static final String WRITE_TO_CSV_TAG = "CSV writing";
+    public static final String FILEPATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString();
+    public static final String ACTIVITY_FILENAME = "DataOPG5.csv";
+    private final String ACCELEROMETER_FILENAME = "AccData.csv";
+    private final String GYROSCOPE_FILENAME = "AccData.csv";
+    private final int WRITE_PERMISSION_CODE = 1;
+
     private Activity activity = this;
     private LocationListener locationListener;
     private LocationManager locationManager;
     private ActivityRecognitionClient mActivityRecognitionClient;
-    private final int WRITE_PERMISSION_CODE = 001;
     private ConstraintLayout constraintLayout;
     private SensorManager mSensorManager;
     private ArrayList<String> dataAcc;
@@ -118,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         gpsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    Snackbar.make(constraintLayout, "You are an idiot(Permission DENIED!)", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(constraintLayout, R.string.permission_denied, Snackbar.LENGTH_SHORT).show();
                     ActivityCompat.requestPermissions(this,
                             new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                             WRITE_PERMISSION_CODE);
@@ -152,9 +157,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         //Last Known Location
         Button buttonOne = findViewById(R.id.getLastLocation_Button);
-        buttonOne.setOnClickListener(v -> {
-            getLastKnownLocation();
-        });
+        buttonOne.setOnClickListener(v -> getLastKnownLocation());
 
         //Sound
         SoundLevelDetector.SoundLevelListener soundLevelListener = level -> {
@@ -247,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                             != PackageManager.PERMISSION_GRANTED) {
                         // Permission is not granted
-                        Snackbar.make(constraintLayout, "You are an idiot(Permission DENIED!)", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(constraintLayout, R.string.permission_denied, Snackbar.LENGTH_SHORT).show();
                         ActivityCompat.requestPermissions(this,
                                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                                 WRITE_PERMISSION_CODE);
@@ -274,6 +277,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
                     task.addOnSuccessListener(
                             result -> {
+                                appendTextToTextView("File saved: "+ Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS));
                                 pendingIntent.cancel();
                                 Log.d(ACTIVITY_TAG, "successful Detached");
                             });
@@ -314,14 +318,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                             != PackageManager.PERMISSION_GRANTED) {
                         // Permission is not granted
-                        Snackbar.make(constraintLayout, "You are an idiot(Permission DENIED!)", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(constraintLayout, R.string.permission_denied, Snackbar.LENGTH_SHORT).show();
                         ActivityCompat.requestPermissions(this,
                                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                                 WRITE_PERMISSION_CODE);
                     } else {
                         isWritingToCSV = true;
-                        appendAccCSV(dataAcc, "AccData.csv");
-                        appendAccCSV(dataGyro, "GyroData.csv");
+                        appendAccCSV(dataAcc, this.ACCELEROMETER_FILENAME);
+                        appendAccCSV(dataGyro, this.GYROSCOPE_FILENAME);
                     }
 
                 } else {
@@ -362,7 +366,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      */
     private void getLastKnownLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Snackbar.make(constraintLayout, "You are an idiot(Permission DENIED!)", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(constraintLayout, R.string.permission_denied, Snackbar.LENGTH_SHORT).show();
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                     WRITE_PERMISSION_CODE);
@@ -447,7 +451,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void isDone(Boolean isCompleted, String fileName) {
         if (isCompleted) {
             isWritingToCSV = false;
-            appendTextToTextView("Data saved in " + Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + ", File name: " + fileName);
+            appendTextToTextView("Data saved in " + FILEPATH + ", File name: " + fileName);
         } else {
             Snackbar.make(constraintLayout, "An error occurred with file: " + fileName, Snackbar.LENGTH_LONG).show();
         }

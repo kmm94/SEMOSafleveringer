@@ -38,7 +38,7 @@ public class BroadcastReceiver extends IntentService {
     public static final String UNKNOWN = "Unknown";
     public static final String EXTRA = ": ";
     private final String WRITE_TAG = "CSVWriter";
-    public static TreeMap<String, ActivityHolder> data = new TreeMap<String, ActivityHolder>();
+    public static TreeMap<String, ActivityHolder> data = new TreeMap<>();
 
     public BroadcastReceiver() {
         super("ACTIVITY");
@@ -107,10 +107,9 @@ public class BroadcastReceiver extends IntentService {
     }
 
     private void toUI(String format, ActivityHolder activity) {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            public void run() {
-                MainActivity.textView.append("Timestamp: " + format + "\n Status: " + activity.getActivityName() + ". Confidence: " + activity.getActivity().getConfidence() + "\n");
-            }
+        new Handler(Looper.getMainLooper()).post(() -> {
+            MainActivity.textView.append("Timestamp: " + format + "\n Status: " + activity.getActivityName() + ". Confidence: " + activity.getActivity().getConfidence() + "\n");
+
         });
     }
 
@@ -125,7 +124,7 @@ public class BroadcastReceiver extends IntentService {
     private void writeToCSV(TreeMap<String, ActivityHolder> data) {
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state)) {
-            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "DataOPG5.csv");
+            File file = new File(MainActivity.FILEPATH, MainActivity.ACTIVITY_FILENAME);
             CsvWriter csvWriter = new CsvWriter();
             csvWriter.setFieldSeparator(';');
             try (CsvAppender csvAppender = csvWriter.append(file, StandardCharsets.UTF_8)) {

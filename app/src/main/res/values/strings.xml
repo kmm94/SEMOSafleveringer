@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">SEOMS</string>
+    <string name="permission_denied">You are an idiot(Permission DENIED!)</string>
 </resources>
