@@ -95,10 +95,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         //Get GPS Location
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(activity, "You are an idiot(Permission DENIED!)", Toast.LENGTH_LONG).show();
-            return;
-        }
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
@@ -121,6 +117,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Switch gpsSwitch = findViewById(R.id.gps_switch);
         gpsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    Snackbar.make(constraintLayout, "You are an idiot(Permission DENIED!)", Snackbar.LENGTH_SHORT).show();
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                            WRITE_PERMISSION_CODE);
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            WRITE_PERMISSION_CODE);
+                    return;
+                }
                 Toast.makeText(activity, "Getting GPS location", Toast.LENGTH_SHORT).show();
                 /**
                  * Task 4
@@ -161,8 +167,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Switch soundSwitch = findViewById(R.id.sound_switch);
         soundSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
-                Toast.makeText(activity, "listening to sound", Toast.LENGTH_SHORT).show();
-                Sensey.getInstance().startSoundLevelDetection(activity, soundLevelListener);
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED){
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.RECORD_AUDIO},
+                            WRITE_PERMISSION_CODE);
+                } else {
+                    Toast.makeText(activity, "listening to sound", Toast.LENGTH_SHORT).show();
+                    Sensey.getInstance().startSoundLevelDetection(activity, soundLevelListener);
+                }
             } else {
                 Sensey.getInstance().stopSoundLevelDetection();
             }
@@ -297,9 +309,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 mSensorManager.unregisterListener(this, mGyroSensor);
                 mSensorManager.unregisterListener(this, mAccSensor);
                 if (!isWritingToCSV) {
-                    isWritingToCSV = true;
-                    appendAccCSV(dataAcc, "AccData.csv");
-                    appendAccCSV(dataGyro, "GyroData.csv");
+
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        // Permission is not granted
+                        Snackbar.make(constraintLayout, "You are an idiot(Permission DENIED!)", Snackbar.LENGTH_SHORT).show();
+                        ActivityCompat.requestPermissions(this,
+                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                WRITE_PERMISSION_CODE);
+                    } else {
+                        isWritingToCSV = true;
+                        appendAccCSV(dataAcc, "AccData.csv");
+                        appendAccCSV(dataGyro, "GyroData.csv");
+                    }
+
                 } else {
                     appendTextToTextView("Writing in progress, can't save data now");
                 }
@@ -345,7 +368,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     WRITE_PERMISSION_CODE);
-            return;
+        return;
         }
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, location -> {
