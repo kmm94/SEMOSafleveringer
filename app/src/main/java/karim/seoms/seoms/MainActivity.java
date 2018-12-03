@@ -277,7 +277,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
                     task.addOnSuccessListener(
                             result -> {
-                                appendTextToTextView("File saved: "+ Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS));
+                                appendTextToTextView("Data saved in " + FILEPATH + ", File name: " + ACTIVITY_FILENAME);
                                 pendingIntent.cancel();
                                 Log.d(ACTIVITY_TAG, "successful Detached");
                             });
