@@ -242,30 +242,31 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         Switch recordActivitySwitch = findViewById(R.id.activity_switch);
         recordActivitySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
-                // Permission is not granted
-                Snackbar.make(constraintLayout, "You are an idiot(Permission DENIED!)", Snackbar.LENGTH_SHORT).show();
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        WRITE_PERMISSION_CODE);
-
-            } else {
                 mActivityRecognitionClient = new ActivityRecognitionClient(this);
                 if (isChecked) {
-                    //activity recognition:
-                    Task<Void> task = mActivityRecognitionClient.requestActivityUpdates(1000, pendingIntent);
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        // Permission is not granted
+                        Snackbar.make(constraintLayout, "You are an idiot(Permission DENIED!)", Snackbar.LENGTH_SHORT).show();
+                        ActivityCompat.requestPermissions(this,
+                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                WRITE_PERMISSION_CODE);
 
-                    task.addOnSuccessListener(
-                            result -> Log.d(ACTIVITY_TAG, "successful attached")
-                    );
+                    } else {
+                        //activity recognition:
+                        Task<Void> task = mActivityRecognitionClient.requestActivityUpdates(1000, pendingIntent);
 
-                    task.addOnFailureListener(
-                            e -> {
-                                // Handle error
-                                Log.e(ACTIVITY_TAG, "attaching Failed error: " + e.getMessage());
-                            }
-                    );
+                        task.addOnSuccessListener(
+                                result -> Log.d(ACTIVITY_TAG, "successful attached")
+                        );
+
+                        task.addOnFailureListener(
+                                e -> {
+                                    // Handle error
+                                    Log.e(ACTIVITY_TAG, "attaching Failed error: " + e.getMessage());
+                                }
+                        );
+                    }
                 } else {
                     //Activity recognition
                     Task<Void> task =
@@ -280,7 +281,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     task.addOnFailureListener(
                             e -> Log.e(ACTIVITY_TAG, e.getMessage()));
                 }
-            }
+
         });
 
         /**
