@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public static final String FILEPATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString();
     public static final String ACTIVITY_FILENAME = "DataOPG5.csv";
     private final String ACCELEROMETER_FILENAME = "AccData.csv";
-    private final String GYROSCOPE_FILENAME = "AccData.csv";
+    private final String GYROSCOPE_FILENAME = "GyroData.csv";
     private final int WRITE_PERMISSION_CODE = 1;
 
     private Activity activity = this;
