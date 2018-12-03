@@ -18,6 +18,7 @@ import de.siegmar.fastcsv.writer.CsvWriter;
 public class WriteToCSVFileTask extends AsyncTask<String ,Void,Boolean> {
     private IsDoneWritingToCSV isDoneWritingToCSV;
     private String filename;
+    private boolean isCompleted = true;
 
     public WriteToCSVFileTask(IsDoneWritingToCSV isDoneWritingToCSV) {
         this.isDoneWritingToCSV = isDoneWritingToCSV;
@@ -45,20 +46,28 @@ public class WriteToCSVFileTask extends AsyncTask<String ,Void,Boolean> {
                         csvAppender.appendLine(x,y,z);
                         Log.d(MainActivity.WRITE_TO_CSV_TAG,"Writing Data: "+ strings[0]);
                     } catch (IOException e) {
+                        isCompleted = false;
                         e.printStackTrace();
                     }
                 }
 
             } catch (IOException e) {
+                isCompleted = false;
                 e.printStackTrace();
             }
         }
-    return true;
+    return isCompleted;
     }
 
     @Override
-    protected void onPostExecute(Boolean aBoolean) {
-        super.onPostExecute(aBoolean);
-        isDoneWritingToCSV.isDone(aBoolean, filename);
+    protected void onCancelled() {
+        super.onCancelled();
+        isDoneWritingToCSV.isDone(isCompleted,filename);
+    }
+
+    @Override
+    protected void onPostExecute(Boolean isCompleted) {
+        super.onPostExecute(isCompleted);
+        isDoneWritingToCSV.isDone(isCompleted, filename);
     }
 }

@@ -434,8 +434,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     @Override
-    public void isDone(Boolean b, String fileName) {
-        isWritingToCSV = false;
-        appendTextToTextView("Data saved in Documents, file name: " + fileName);
+    public void isDone(Boolean isCompleted, String fileName) {
+        if(isCompleted) {
+            isWritingToCSV = false;
+            appendTextToTextView("Data saved in Documents, file name: " + fileName);
+        } else {
+            Snackbar.make(constraintLayout, "An error occurred with file: " + fileName, Snackbar.LENGTH_LONG);
+        }
     }
 }
