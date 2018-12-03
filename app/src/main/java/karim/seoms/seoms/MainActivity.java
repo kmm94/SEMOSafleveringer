@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Activity activity = this;
     private LocationListener locationListener;
     private LocationManager locationManager;
-    private karim.seoms.seoms.BroadcastReceiver broadcastReceiver;
     private ActivityRecognitionClient mActivityRecognitionClient;
     private final int WRITE_PERMISSION_CODE = 001;
     private ConstraintLayout constraintLayout;
@@ -88,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         textView.setText("");
         textView.setMovementMethod(new ScrollingMovementMethod());
 
+        appendTextToTextView("Remember to set all permissions manually!! \n They can be found under settings -> apps -> find the app(SEOMS) -> permissions");
+
 /**
  * Task 1:
  * Check out android sensor API
@@ -99,10 +100,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         //Get GPS Location
-
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(activity, "YOU SHALL NOT PASS", Toast.LENGTH_LONG).show();
+            Toast.makeText(activity, "You are an idiot(Permission DENIED!)", Toast.LENGTH_LONG).show();
             return;
         }
         locationListener = new LocationListener() {
@@ -305,7 +305,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             } else {
                 mSensorManager.unregisterListener(this, mGyroSensor);
                 mSensorManager.unregisterListener(this, mAccSensor);
-                if(!isWritingToCSV) {
+                if (!isWritingToCSV) {
                     isWritingToCSV = true;
                     appendAccCSV(dataAcc, "AccData.csv");
                     appendAccCSV(dataGyro, "GyroData.csv");
@@ -350,7 +350,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     /**
-     * Prints last know location to screen.
+     * Prints last known location to screen.
      */
     private void getLastKnownLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -444,9 +444,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void isDone(Boolean isCompleted, String fileName) {
-        if(isCompleted) {
+        if (isCompleted) {
             isWritingToCSV = false;
-            appendTextToTextView("Data saved in "+ Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) +", File name: " + fileName);
+            appendTextToTextView("Data saved in " + Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + ", File name: " + fileName);
         } else {
             Snackbar.make(constraintLayout, "An error occurred with file: " + fileName, Snackbar.LENGTH_LONG).show();
         }

@@ -14,7 +14,6 @@ import de.siegmar.fastcsv.writer.CsvWriter;
 /**
  * Concurrent Task for assignment 7
  */
-
 public class WriteToCSVFileTask extends AsyncTask<String ,Void,Boolean> {
     private IsDoneWritingToCSV isDoneWritingToCSV;
     private String filename;
