@@ -130,26 +130,27 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     ActivityCompat.requestPermissions(this,
                             new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                             WRITE_PERMISSION_CODE);
-                    return;
-                }
-                Toast.makeText(activity, "Getting GPS location", Toast.LENGTH_SHORT).show();
-                /**
-                 * Task 4
-                 * Choose a QAS(Quality attribute scenario)
-                 * i choose Energy efficiency, which is about optimising a sensor to use less power.
-                 *
-                 * Task 6
-                 * Pick a tactic on energy efficiency.
-                 * Implement an architectural prototype that illustrates the tactic.
-                 * Hand-in a summary of how the prototype explores the tactic including code snippets from your prototype code.
-                 *
-                 * Solution to 4 & 6:
-                 * Use android build in minDistance on gps compare 0 to 10 with the android profiler to see
-                 * if power is estimated to be saved.
-                 */
-                int minDis = 0;
 
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, minDis, locationListener);
+                } else {
+                    Toast.makeText(activity, "Getting GPS location", Toast.LENGTH_SHORT).show();
+                    /**
+                     * Task 4
+                     * Choose a QAS(Quality attribute scenario)
+                     * i choose Energy efficiency, which is about optimising a sensor to use less power.
+                     *
+                     * Task 6
+                     * Pick a tactic on energy efficiency.
+                     * Implement an architectural prototype that illustrates the tactic.
+                     * Hand-in a summary of how the prototype explores the tactic including code snippets from your prototype code.
+                     *
+                     * Solution to 4 & 6:
+                     * Use android build in minDistance on gps compare 0 to 10 with the android profiler to see
+                     * if power is estimated to be saved.
+                     */
+                    int minDis = 0;
+
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, minDis, locationListener);
+                }
             } else {
                 locationManager.removeUpdates(locationListener);
             }
